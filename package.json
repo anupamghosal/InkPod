@@ -1,0 +1,25 @@
+{
+  "name": "inkpod-api",
+  "version": "0.0.1",
+  "description": "This is the inpod backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "Suman Kumar Saha",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "form-data": "^4.0.0",
+    "helmet": "^4.6.0",
+    "imgur": "^1.0.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.12",
+    "multer": "^1.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}

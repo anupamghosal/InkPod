@@ -1,0 +1,8 @@
+# dependency folder
+node_modules/
+
+# cred file
+nodemon.json
+
+# VS todo
+Todo
