@@ -66,7 +66,7 @@ router.post("/register", (req, res) => {
           } else {
             const token = jwt.sign({ newUser }, secret);
             return res.status(200).json({
-              sucess: true,
+              success: true,
               message: "User successfully registered",
               user: rmPassword(newUser),
               token,
@@ -81,28 +81,40 @@ router.post("/register", (req, res) => {
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  if (!email) return res.status(400).json({ message: "Email is required" });
+  if (!email)
+    return res
+      .status(400)
+      .json({ success: false, message: "Email is required" });
   if (!password)
-    return res.status(400).json({ message: "Password is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Password is required" });
 
   User.findOne({ email }, (err, user) => {
     if (err)
       return res
         .status(400)
         .json({ message: "Unexpected error! Please try again" });
-    if (!user) return res.status(401).json({ message: "Email not registered" });
+    if (!user)
+      return res
+        .status(401)
+        .json({ success: false, message: "Email not registered" });
     User.comparePassword(password, user.password, (err, isMatch) => {
       if (err)
         return res
           .status(400)
-          .json({ message: "Unexpected error! Please try again" });
+          .json({
+            success: false,
+            message: "Unexpected error! Please try again",
+          });
       if (!isMatch)
         return res
           .status(401)
-          .json({ message: "Email or Password did not match" });
+          .json({ success: false, message: "Email or Password did not match" });
 
       const token = jwt.sign({ user }, secret);
       return res.status(200).json({
+        success: true,
         message: "User successfully logged in",
         token,
         user: rmPassword(user),
