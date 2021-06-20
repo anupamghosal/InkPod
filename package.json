@@ -15,6 +15,7 @@
     "form-data": "^4.0.0",
     "helmet": "^4.6.0",
     "imgur": "^1.0.2",
+    "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.12",
     "multer": "^1.4.2"

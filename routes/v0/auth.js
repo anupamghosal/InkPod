@@ -7,18 +7,28 @@ const router = express.Router();
 const User = require("../../models/User");
 
 const rmPassword = require("../../utils/prod-util/removePass");
+const {
+  validateEmail,
+  validatePassword,
+  validateName,
+} = require("../../utils/prod-util/validators");
 
 const secret = process.env.AUTH_SECRET;
 
 router.post("/register", (req, res) => {
-  const { name, email, password, confirmPassword, gender } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
 
-  if (!name || !email || !password || !confirmPassword) {
+  const errors = [
+    validateEmail(email),
+    validatePassword(password),
+    validateName(name),
+  ].filter(Boolean);
+
+  if (errors.length)
     return res.status(400).json({
       success: false,
-      message: "Fields cannot be empty",
+      message: errors[0].details[0].message,
     });
-  }
 
   if (password !== confirmPassword) {
     return res.status(400).json({
@@ -38,7 +48,6 @@ router.post("/register", (req, res) => {
       name,
       email,
       password,
-      gender,
     });
 
     bcrypt.genSalt(11, (err, salt) => {
@@ -81,14 +90,15 @@ router.post("/register", (req, res) => {
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  if (!email)
-    return res
-      .status(400)
-      .json({ success: false, message: "Email is required" });
-  if (!password)
-    return res
-      .status(400)
-      .json({ success: false, message: "Password is required" });
+  const errors = [validateEmail(email), validatePassword(password)].filter(
+    Boolean
+  );
+
+  if (errors.length)
+    return res.status(400).json({
+      success: false,
+      message: errors[0].details[0].message,
+    });
 
   User.findOne({ email }, (err, user) => {
     if (err)
@@ -101,12 +111,10 @@ router.post("/login", (req, res) => {
         .json({ success: false, message: "Email not registered" });
     User.comparePassword(password, user.password, (err, isMatch) => {
       if (err)
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Unexpected error! Please try again",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Unexpected error! Please try again",
+        });
       if (!isMatch)
         return res
           .status(401)
