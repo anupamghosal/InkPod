@@ -32,11 +32,11 @@ router.post("/", async (req, res) => {
     });
   }
 
-  // if (!file)
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: "Cannot post an article without an image",
-  //   });
+  if (!file)
+    return res.status(400).json({
+      success: false,
+      message: "Cannot post an article without an image",
+    });
 
   let imageUrl = "";
 
@@ -65,6 +65,8 @@ router.post("/", async (req, res) => {
       coverImg: imageUrl,
     });
 
+    console.log("check 1");
+
     newArticle.save((err) => {
       if (err)
         return res.json(500).status({
@@ -72,20 +74,23 @@ router.post("/", async (req, res) => {
           message: "Unknown error occured while saving article.",
           err,
         });
-
-      res.json({
-        success: true,
-        message: "Article saved successfully.",
-      });
+      console.log("check 2");
 
       User.updateOne(
         { _id: userId },
         { $push: { articles: _id } },
         {},
         (err, _) => {
-          if (err) console.log(err);
+          if (err) console.log({ ERROR111: err });
         }
       );
+    });
+
+    console.log("check 3");
+
+    return res.json({
+      success: true,
+      message: "Article saved successfully.",
     });
   } catch (err) {
     return res.status(500).json({
