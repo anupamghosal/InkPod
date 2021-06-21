@@ -65,8 +65,6 @@ router.post("/", async (req, res) => {
       coverImg: imageUrl,
     });
 
-    console.log("check 1");
-
     newArticle.save((err) => {
       if (err)
         return res.json(500).status({
@@ -74,7 +72,6 @@ router.post("/", async (req, res) => {
           message: "Unknown error occured while saving article.",
           err,
         });
-      console.log("check 2");
 
       User.updateOne(
         { _id: userId },
@@ -85,8 +82,6 @@ router.post("/", async (req, res) => {
         }
       );
     });
-
-    console.log("check 3");
 
     return res.json({
       success: true,
