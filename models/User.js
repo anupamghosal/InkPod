@@ -16,6 +16,15 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  userVerified: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  emailToken: {
+    type: String,
+    required: true,
+  },
   userType: {
     type: String,
     enum: ["user", "moderator"],

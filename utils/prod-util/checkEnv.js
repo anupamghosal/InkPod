@@ -4,6 +4,10 @@ module.exports = checkEnv = () => {
     errors.push("Database password missing from env variables.");
   if (!process.env.AUTH_SECRET)
     errors.push("Encrypting string missing from env variables.");
+  if (!process.env.EMAIL_SECRET)
+    errors.push("Email encryption string missing from env variables.");
+  if (!process.env.EMAIL_PASS)
+    errors.push("Email authentication missing from env variables.");
 
   if (errors.length === 0) return;
   console.log("\n\x1b[1m%s\x1b[0m", "Aborting due to following errors:\n");

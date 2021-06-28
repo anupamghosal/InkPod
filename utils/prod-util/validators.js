@@ -7,7 +7,12 @@ const validateEmail = (email) => {
 
 const validatePassword = (password) => {
   const passwordSchema = Joi.object({
-    password: Joi.string().alphanum().min(8).max(15).required(),
+    password: Joi.string()
+      .trim()
+      .min(8)
+      .max(15)
+      .required()
+      .invalid("<", ">", "{", "}"),
   });
   return passwordSchema.validate({ password }).error;
 };

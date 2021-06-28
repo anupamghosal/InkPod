@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
+const verifyTemplate = require("../../emailTemplates/verifyMail");
+const mailer = require("../../config/mailer");
+
 const User = require("../../models/User");
 
 const rmPassword = require("../../utils/prod-util/removePass");
@@ -14,6 +17,7 @@ const {
 } = require("../../utils/prod-util/validators");
 
 const secret = process.env.AUTH_SECRET;
+const emailSecret = process.env.EMAIL_SECRET;
 
 router.post("/register", (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
@@ -37,17 +41,20 @@ router.post("/register", (req, res) => {
     });
   }
 
-  User.findOne({ email: email }).then((user) => {
+  User.findOne({ email: email }).then(async (user) => {
     if (user)
       return res.status(403).json({
         success: false,
         message: "Email already exists. Try logging in.",
       });
 
+    const emailToken = await jwt.sign({ email }, emailSecret);
+
     const newUser = new User({
       name,
       email,
       password,
+      emailToken,
     });
 
     bcrypt.genSalt(11, (err, salt) => {
@@ -74,6 +81,15 @@ router.post("/register", (req, res) => {
             });
           } else {
             const token = jwt.sign({ newUser }, secret);
+
+            sendVerification({
+              email,
+              template: verifyTemplate({
+                userName: `${name.split(" ")[0]}`,
+                verifyLink: `https://www.inkpod.org/auth/confirm/${emailToken}`,
+              }),
+            });
+
             return res.status(200).json({
               success: true,
               message: "User successfully registered",
@@ -129,6 +145,74 @@ router.post("/login", (req, res) => {
       });
     });
   });
+});
+
+router.post("/confirm", (req, res) => {
+  const { token } = req.body;
+  try {
+    const email = jwt.verify(token, emailSecret).email;
+
+    User.findOne({ email }).then(async (user) => {
+      if (!user)
+        return res
+          .status(403)
+          .json({ success: false, message: "Cannot verify your email." });
+
+      await User.findOneAndUpdate(
+        { _id: user._id },
+        { userVerified: true, $unset: { emailToken: "" } }
+      );
+      return res.status(200).json({
+        success: true,
+        message: "User has been successfully verified",
+      });
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
+  }
+});
+
+router.get("/confirm", (req, res) => {
+  const { email } = req.query;
+
+  try {
+    User.findOne({ email }).then(async (user) => {
+      if (!user)
+        return res
+          .status(403)
+          .json({ success: false, message: "Email address not registered" });
+
+      if (!!user.userVerified)
+        return res
+          .status(403)
+          .json({ success: false, message: "User already verified" });
+
+      const emailToken = await jwt.sign({ email }, emailSecret);
+
+      User.findOneAndUpdate({ _id: user._id }, { emailToken });
+
+      sendVerification({
+        email,
+        template: verifyTemplate({
+          userName: `${user.name.split(" ")[0]}`,
+          verifyLink: `https://www.inkpod.org/auth/confirm/${emailToken}`,
+        }),
+      });
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Verification mail sent" });
+    });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
+  }
 });
 
 module.exports = router;
