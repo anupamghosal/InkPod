@@ -33,7 +33,7 @@ const topics = [
   },
   {
     title: "International",
-    title: "international",
+    value: "international",
     imgUrl: `${BASE_URL}/topics/international.jpg`,
   },
   {
