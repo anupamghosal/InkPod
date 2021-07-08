@@ -80,6 +80,7 @@ const user = require(`./routes/${SelfConfig.API_LEVEL}/user`);
 const article = require(`./routes/${SelfConfig.API_LEVEL}/article`);
 const comment = require(`./routes/${SelfConfig.API_LEVEL}/comment`);
 const topics = require(`./routes/${SelfConfig.API_LEVEL}/topics`);
+const admin = require(`./routes/${SelfConfig.API_LEVEL}/admin`);
 
 // mount routes
 app.use(`/${SelfConfig.API_LEVEL}/auth`, auth);
@@ -87,6 +88,7 @@ app.use(`/${SelfConfig.API_LEVEL}/user`, user);
 app.use(`/${SelfConfig.API_LEVEL}/article`, article);
 app.use(`/${SelfConfig.API_LEVEL}/comment`, comment);
 app.use(`/${SelfConfig.API_LEVEL}/topics`, topics);
+app.use(`/${SelfConfig.API_LEVEL}/admin`, admin);
 
 app.get("/", (_, res) => {
   res.send(
