@@ -19,7 +19,7 @@ let articleSchema = mongoose.Schema({
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
   dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "comment" }],
-  topic: { type: String, enum: ["cricket"] },
+  topic: { type: String },
   approved: { type: Boolean, default: false },
   views: { type: Number, default: 0 },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },

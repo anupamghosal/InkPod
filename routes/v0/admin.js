@@ -5,7 +5,9 @@ const router = express.Router();
 const Article = require("../../models/Article");
 
 router.get("/", (req, res) => {
-  Article.find({})
+  Article.find({
+    approved: { $ne: true },
+  })
     .sort({
       createdOn: -1,
     })
@@ -25,18 +27,18 @@ router.get("/", (req, res) => {
     });
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const { action, articleId } = req.body;
 
   if (action.toLowerCase() === "accept") {
-    // Article.findByIdAndUpdate(articleId, { approved: true });
-    res.status(200).json({
+    await Article.updateOne({ _id: articleId }, { approved: true });
+    return res.status(200).json({
       success: true,
       message: `Accepted article with id - ${articleId}`,
     });
   } else if (action.toLowerCase() === "reject") {
-    // Article.findByIdAndDelete(articleId);
-    res.status(200).json({
+    await Article.findByIdAndDelete(articleId);
+    return res.status(200).json({
       success: true,
       message: `Rejected article with id - ${articleId}`,
     });
