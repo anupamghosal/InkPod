@@ -97,7 +97,7 @@ router.post("/", async (req, res) => {
 
 router.get("/", (req, res) => {
   const { type, category } = req.query;
-  let query = {};
+  let query = { approved: true };
   if (type && type !== "global" && type !== "national") query = { m: 1 };
   if (category && topics.filter((topic) => topic.value == category))
     query = { ...{ category }, ...query };
