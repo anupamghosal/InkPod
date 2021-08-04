@@ -99,11 +99,14 @@ router.get("/", (req, res) => {
   const { type, category } = req.query;
   let query = { approved: true };
   if (type && type !== "global" && type !== "national") query = { m: 1 };
+
   if (category && topics.filter((topic) => topic.value == category))
     query = { ...{ category }, ...query };
 
+  const limit = type ? 20 : Infinity;
+
   Article.find(query)
-    .limit(100)
+    .limit(limit)
     .populate("owner", ["name", "_id"])
     .sort({ createdOn: -1 })
     .exec((err, articles) => {
