@@ -98,17 +98,19 @@ router.post("/", async (req, res) => {
 router.get("/", (req, res) => {
   const { type, category } = req.query;
   let query = { approved: true };
-  if (type && type !== "global" && type !== "national") query = { m: 1 };
+  let trendingSort;
+  if (type && type !== "global" && type !== "national")
+    trendingSort = { likes: 1 };
 
   if (category && topics.filter((topic) => topic.value == category))
     query = { ...{ category }, ...query };
 
-  const limit = type ? 20 : Infinity;
+  const limit = type ? 15 : Infinity;
 
   Article.find(query)
-    .limit(limit)
+    .limit(parseInt(limit))
     .populate("owner", ["name", "_id"])
-    .sort({ createdOn: -1 })
+    .sort({ createdOn: -1, ...trendingSort })
     .exec((err, articles) => {
       if (err)
         return res.status(500).json({
